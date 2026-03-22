@@ -26,7 +26,7 @@
         .section-subtext { color: var(--text-muted); margin-bottom: 30px; font-size: 0.95rem; max-width: 600px; margin-inline: auto; }
         
         .video-slider { width: 100%; overflow: hidden; position: relative; cursor: grab; background: var(--bg-tertiary); border-radius: 24px; padding: 40px 0; margin-bottom: 60px; touch-action: pan-y; }
-        .video-track { display: flex; width: max-content; will-change: transform; }
+        .video-track { display: flex; justify-content: center; width: max-content; min-width: 100%; will-change: transform; transition: transform 0.1s ease-out; }
 
         .video-card { 
             position: relative; 
@@ -76,11 +76,11 @@
             transition: transform 0.1s ease;
         }
 
-        /* Full border radius for videos with no text */
+        /* Fully rounded corners for videos since there is no text below them now */
         .video-inner { position: relative; width: 100%; padding-bottom: 56.25%; background: #000; border-radius: 17px; overflow: hidden; }
         .vertical-video-inner { position: relative; width: 100%; padding-bottom: 177.77%; background: #000; border-radius: 17px; overflow: hidden; }
         
-        /* YouTube iframes set to ignore clicks (pointer-events: none) so dragging is perfectly smooth */
+        /* YouTube iframes set to ignore clicks so dragging is perfectly smooth */
         .video-inner iframe, .vertical-video-inner iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; z-index: 1; pointer-events: none; }
 
         .thumbnail-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; cursor: pointer; background: #000; display: flex; align-items: center; justify-content: center; border-radius: 17px; }
@@ -217,37 +217,15 @@
             themeBtn.innerText = document.body.classList.contains('light-mode') ? '🌙' : '☀️'; 
         };
 
-        // Infinite Loop JS is BACK
+        // Static Bounded Drag Slider (No infinite scroll loop for the cards)
         function setupSlider(sliderId, trackId) { 
             const track = document.getElementById(trackId); 
             const slider = document.getElementById(sliderId); 
-            // Duplicate content for infinite loop
-            track.innerHTML += track.innerHTML; 
             
-            let currentX = 0, isDragging = false, startX = 0, isHovered = false, isClickAllowed = true;
-            let halfWidth = track.scrollWidth / 2;
-
-            window.addEventListener('resize', () => {
-                halfWidth = track.scrollWidth / 2;
-            });
-            
-            function animate() { 
-                if (!isDragging && !isHovered && slider.dataset.playing !== 'true') { 
-                    currentX -= 0.7; // Scrolling Speed
-                    if (currentX <= -halfWidth) {
-                        currentX += halfWidth; 
-                    }
-                    track.style.transform = `translate3d(${currentX}px, 0, 0)`; 
-                } 
-                requestAnimationFrame(animate); 
-            } 
-            animate();
-            
-            slider.onmouseenter = () => isHovered = true; 
-            slider.onmouseleave = () => isHovered = false;
+            let currentX = 0, isDragging = false, startX = 0, isClickAllowed = true;
             
             const startAction = (e) => { 
-                isDragging = true; isHovered = true; isClickAllowed = true; 
+                isDragging = true; isClickAllowed = true; 
                 const ev = e.touches ? e.touches[0] : e; 
                 startX = ev.pageX - currentX; 
             };
@@ -259,18 +237,15 @@
                 if (Math.abs(x - currentX) > 5) isClickAllowed = false; 
                 currentX = x; 
                 
-                if (currentX <= -halfWidth) {
-                    currentX += halfWidth;
-                    startX -= halfWidth;
-                } else if (currentX > 0) {
-                    currentX -= halfWidth;
-                    startX += halfWidth;
-                }
+                const maxScroll = -(track.scrollWidth - slider.clientWidth);
+                if (currentX > 0) currentX = 0;
+                if (currentX < maxScroll && maxScroll < 0) currentX = maxScroll;
+                else if (maxScroll >= 0) currentX = 0; 
                 
                 track.style.transform = `translate3d(${currentX}px, 0, 0)`; 
             };
             
-            const endAction = () => { isDragging = false; setTimeout(() => { if (!isDragging) isHovered = false; }, 1500); };
+            const endAction = () => { isDragging = false; };
             
             slider.addEventListener('mousedown', startAction); window.addEventListener('mousemove', moveAction); window.addEventListener('mouseup', endAction);
             slider.addEventListener('touchstart', startAction, {passive: true}); window.addEventListener('touchmove', moveAction); window.addEventListener('touchend', endAction);
@@ -313,11 +288,6 @@
             if(iframe) {
                 var currentSrc = iframe.src;
                 iframe.src = currentSrc.includes('?') ? currentSrc + "&autoplay=1" : currentSrc + "?autoplay=1";
-            }
-            
-            var parentSlider = document.getElementById(sliderId);
-            if(parentSlider) {
-                parentSlider.dataset.playing = 'true';
             }
         }
     </script>
