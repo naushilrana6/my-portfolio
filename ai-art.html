@@ -26,7 +26,8 @@
         .section-subtext { color: var(--text-muted); margin-bottom: 30px; font-size: 0.95rem; max-width: 600px; margin-inline: auto; }
         
         .video-slider { width: 100%; overflow: hidden; position: relative; cursor: grab; background: var(--bg-tertiary); border-radius: 24px; padding: 40px 0; margin-bottom: 60px; touch-action: pan-y; }
-        .video-track { display: flex; width: max-content; will-change: transform; }
+        
+        .video-track { display: flex; justify-content: center; width: max-content; min-width: 100%; will-change: transform; transition: transform 0.1s ease-out; }
 
         .video-card { 
             position: relative; 
@@ -76,20 +77,17 @@
             transition: transform 0.1s ease;
         }
 
-        .video-inner { position: relative; width: 100%; padding-bottom: 56.25%; background: #000; border-radius: 17px 17px 0 0; overflow: hidden; }
-        .vertical-video-inner { position: relative; width: 100%; padding-bottom: 177.77%; background: #000; border-radius: 17px 17px 0 0; overflow: hidden; }
+        /* Fully rounded corners for videos since there is no text below them now */
+        .video-inner { position: relative; width: 100%; padding-bottom: 56.25%; background: #000; border-radius: 17px; overflow: hidden; }
+        .vertical-video-inner { position: relative; width: 100%; padding-bottom: 177.77%; background: #000; border-radius: 17px; overflow: hidden; }
         .video-inner iframe, .vertical-video-inner iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; z-index: 1; }
 
-        .thumbnail-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; cursor: pointer; background: #000; display: flex; align-items: center; justify-content: center; }
-        .thumbnail-overlay img { width: 100%; height: 100%; object-fit: cover; opacity: 0.7; transition: 0.4s ease; }
+        .thumbnail-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; cursor: pointer; background: #000; display: flex; align-items: center; justify-content: center; border-radius: 17px; }
+        .thumbnail-overlay img { width: 100%; height: 100%; object-fit: cover; opacity: 0.7; transition: 0.4s ease; border-radius: 17px; }
         .play-btn { position: absolute; width: 60px; height: 60px; background: rgba(0, 0, 0, 0.6); border: 2px solid var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--accent); font-size: 22px; transition: 0.3s ease; z-index: 6; box-shadow: 0 0 15px rgba(0, 255, 204, 0.3); }
         .play-btn::after { content: "▶"; margin-left: 4px; }
         .thumbnail-overlay:hover .play-btn { transform: scale(1.1); background: var(--accent); color: #000; }
         .thumbnail-overlay:hover img { opacity: 0.4; }
-
-        .video-info { padding: 15px 20px 20px; text-align: left; position: relative; z-index: 2; }
-        .video-info h3 { font-size: 1.1rem; color: var(--accent); margin-bottom: 5px; font-weight: 600; }
-        .video-info p { font-size: 0.85rem; color: var(--text-muted); line-height: 1.4; pointer-events: none; }
 
         footer { padding: 60px 8% 40px; text-align: center; border-top: 1px solid var(--border-color); margin-top: 50px; background: var(--bg-tertiary); }
         .footer-logo { font-size: 1.6rem; margin-bottom: 10px; display: inline-block; text-decoration: none; color: inherit; }
@@ -125,7 +123,6 @@
                         referrerpolicy="strict-origin-when-cross-origin">
                     </iframe>
                 </div>
-                <div class="video-info"><h3>Cinematic Debut</h3><p>Stylized lighting & rendering.</p></div>
             </div>
 
             <div class="video-card">
@@ -137,7 +134,6 @@
                         referrerpolicy="strict-origin-when-cross-origin">
                     </iframe>
                 </div>
-                <div class="video-info"><h3>Character Motion</h3><p>Fluid motion and weight study.</p></div>
             </div>
 
         </div></div>
@@ -153,7 +149,6 @@
                     </div>
                     <iframe src="https://drive.google.com/file/d/15Cm6i5qyqH5XHTFtLaFyqQgDzZrT7oQj/preview" allow="autoplay; fullscreen"></iframe>
                 </div>
-                <div class="video-info"><h3>Visual Storytelling</h3><p>Advanced AI cinematography.</p></div>
             </div>
             <div class="video-card">
                 <div class="video-inner">
@@ -163,7 +158,6 @@
                     </div>
                     <iframe src="https://drive.google.com/file/d/1wAEekR-x-wkl8umABVbCU_vcPEAXlN4N/preview" allow="autoplay; fullscreen"></iframe>
                 </div>
-                <div class="video-info"><h3>Documentary Style</h3><p>Realism blended with AI logic.</p></div>
             </div>
         </div></div>
 
@@ -174,13 +168,11 @@
                 <div class="video-inner" style="display:flex; align-items:center; justify-content:center; background:#111;">
                     <p style="color:#555; font-weight:800; font-size: 1.5rem;">COMING SOON</p>
                 </div>
-                <div class="video-info"><h3>Project Alpha</h3><p>Storyboarding phase.</p></div>
             </div>
             <div class="video-card">
                 <div class="video-inner" style="display:flex; align-items:center; justify-content:center; background:#111;">
                     <p style="color:#555; font-weight:800; font-size: 1.5rem;">COMING SOON</p>
                 </div>
-                <div class="video-info"><h3>Project Beta</h3><p>Scripting phase.</p></div>
             </div>
         </div></div>
 
@@ -195,7 +187,6 @@
                     </div>
                     <iframe src="https://drive.google.com/file/d/YOUR_VERTICAL_LINK/preview" allow="autoplay; fullscreen"></iframe>
                 </div>
-                <div class="video-info"><h3>Social Media Promo</h3><p>Instagram & TikTok optimized.</p></div>
             </div>
             
             <div class="video-card vertical-card">
@@ -206,7 +197,6 @@
                     </div>
                     <iframe src="https://drive.google.com/file/d/YOUR_VERTICAL_LINK/preview" allow="autoplay; fullscreen"></iframe>
                 </div>
-                <div class="video-info"><h3>Brand Story Reel</h3><p>Engaging vertical layout.</p></div>
             </div>
         </div></div>
 
@@ -229,32 +219,11 @@
         function setupSlider(sliderId, trackId) { 
             const track = document.getElementById(trackId); 
             const slider = document.getElementById(sliderId); 
-            track.innerHTML += track.innerHTML; 
             
-            let currentX = 0, isDragging = false, startX = 0, isHovered = false, isClickAllowed = true;
-            let halfWidth = track.scrollWidth / 2;
-
-            window.addEventListener('resize', () => {
-                halfWidth = track.scrollWidth / 2;
-            });
-            
-            function animate() { 
-                if (!isDragging && !isHovered && slider.dataset.playing !== 'true') { 
-                    currentX -= 0.7; 
-                    if (currentX <= -halfWidth) {
-                        currentX += halfWidth; 
-                    }
-                    track.style.transform = `translate3d(${currentX}px, 0, 0)`; 
-                } 
-                requestAnimationFrame(animate); 
-            } 
-            animate();
-            
-            slider.onmouseenter = () => isHovered = true; 
-            slider.onmouseleave = () => isHovered = false;
+            let currentX = 0, isDragging = false, startX = 0, isClickAllowed = true;
             
             const startAction = (e) => { 
-                isDragging = true; isHovered = true; isClickAllowed = true; 
+                isDragging = true; isClickAllowed = true; 
                 const ev = e.touches ? e.touches[0] : e; 
                 startX = ev.pageX - currentX; 
             };
@@ -266,18 +235,15 @@
                 if (Math.abs(x - currentX) > 5) isClickAllowed = false; 
                 currentX = x; 
                 
-                if (currentX <= -halfWidth) {
-                    currentX += halfWidth;
-                    startX -= halfWidth;
-                } else if (currentX > 0) {
-                    currentX -= halfWidth;
-                    startX += halfWidth;
-                }
+                const maxScroll = -(track.scrollWidth - slider.clientWidth);
+                if (currentX > 0) currentX = 0;
+                if (currentX < maxScroll && maxScroll < 0) currentX = maxScroll;
+                else if (maxScroll >= 0) currentX = 0; 
                 
                 track.style.transform = `translate3d(${currentX}px, 0, 0)`; 
             };
             
-            const endAction = () => { isDragging = false; setTimeout(() => { if (!isDragging) isHovered = false; }, 1500); };
+            const endAction = () => { isDragging = false; };
             
             slider.addEventListener('mousedown', startAction); window.addEventListener('mousemove', moveAction); window.addEventListener('mouseup', endAction);
             slider.addEventListener('touchstart', startAction, {passive: true}); window.addEventListener('touchmove', moveAction); window.addEventListener('touchend', endAction);
@@ -320,11 +286,6 @@
             if(iframe) {
                 var currentSrc = iframe.src;
                 iframe.src = currentSrc.includes('?') ? currentSrc + "&autoplay=1" : currentSrc + "?autoplay=1";
-            }
-            
-            var parentSlider = document.getElementById(sliderId);
-            if(parentSlider) {
-                parentSlider.dataset.playing = 'true';
             }
         }
     </script>
