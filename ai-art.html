@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>3D Animation & AI Art | Naushil Rana</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&family=Space+Grotesk:wght@700;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg-main: #0a0a0a; --bg-secondary: #111111; --bg-tertiary: #1a1a1a; --text-main: #ffffff; --text-muted: #aaaaaa; --accent: #00ffcc; --border-color: #222222; --nav-bg: rgba(10, 10, 10, 0.95); }
+        .light-mode { --bg-main: #f8f9fa; --bg-secondary: #ffffff; --bg-tertiary: #e9ecef; --text-main: #1a1a1a; --text-muted: #555555; --accent: #00997a; --border-color: #dddddd; --nav-bg: rgba(255, 255, 255, 0.95); }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease; }
+        body { background-color: var(--bg-main); color: var(--text-main); overflow-x: hidden; touch-action: pan-y; }
+        
+        .reveal { opacity: 0; transform: translateY(50px); transition: all 0.8s cubic-bezier(0.5, 0, 0, 1); }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+
+        .logo-animate { font-weight: 800; background: linear-gradient(90deg, var(--text-main), var(--accent), var(--text-main)); background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: shineEffect 4s linear infinite; }
+        .dot-blink { color: var(--accent); display: inline-block; animation: dotBreathing 2s ease-in-out infinite; margin-left: 2px; }
+        @keyframes shineEffect { to { background-position: 200% center; } }
+        @keyframes dotBreathing { 0%, 100% { opacity: 1; text-shadow: 0 0 10px var(--accent); } 50% { opacity: 0.3; } }
+        
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 15px 8%; background: var(--nav-bg); position: fixed; width: 100%; z-index: 1000; border-bottom: 1px solid var(--border-color); backdrop-filter: blur(10px); }
+        .back-btn { padding: 8px 20px; background: transparent; color: var(--text-main); border: 1px solid var(--border-color); text-decoration: none; border-radius: 30px; font-size: 0.85rem; font-weight: 600; transition: 0.3s; }
+        .back-btn:hover { border-color: var(--accent); color: var(--accent); }
+        
+        .portfolio-container { padding: 120px 8% 50px; text-align: center; }
+        .section-heading { font-family: 'Space Grotesk', sans-serif; font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 800; margin-bottom: 10px; letter-spacing: -1px; }
+        .section-subtext { color: var(--text-muted); margin-bottom: 50px; font-size: 1rem; max-width: 600px; margin-inline: auto; }
+        
+        .video-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; max-width: 1100px; margin: 0 auto 80px; }
+        
+        .video-wrapper { position: relative; border-radius: 20px; padding: 4px; background: var(--border-color); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); transition: 0.4s; overflow: hidden; }
+        .video-inner { position: relative; padding-bottom: 56.25%; height: 0; background: var(--bg-secondary); border-radius: 16px; overflow: hidden; }
+        .video-inner iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; z-index: 1; }
+
+        .thumbnail-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; cursor: pointer; background: #000; display: flex; align-items: center; justify-content: center; }
+        .thumbnail-overlay img { width: 100%; height: 100%; object-fit: cover; opacity: 0.7; }
+        .play-btn { position: absolute; width: 65px; height: 65px; background: rgba(0, 0, 0, 0.6); border: 2px solid var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--accent); font-size: 24px; transition: 0.3s; z-index: 11; }
+        .thumbnail-overlay:hover .play-btn { transform: scale(1.1); background: var(--accent); color: #000; }
+
+        footer { padding: 60px 8% 40px; text-align: center; border-top: 1px solid var(--border-color); margin-top: 50px; background: var(--bg-tertiary); }
+        @media (max-width: 900px) { .video-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div><a href="index.html" style="text-decoration: none; color: inherit;"><span class="logo-animate" style="font-size: 1.8rem;">Naushil</span><span class="dot-blink" style="font-size: 2rem;">.</span></a></div>
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <button id="themeToggle" style="width:36px; height:36px; border-radius:50%; cursor:pointer; background:var(--bg-secondary); color:var(--text-main); border:1px solid var(--border-color);">☀️</button>
+            <a href="index.html" class="back-btn">Back</a>
+        </div>
+    </header>
+
+    <div class="portfolio-container">
+        <h2 class="section-heading reveal">3D Pixar Animation</h2>
+        <p class="section-subtext reveal">High-quality 3D character animation and cinematic rendering.</p>
+        <div class="video-grid reveal">
+            <div class="video-wrapper"><div class="video-inner"><div class="thumbnail-overlay" onclick="startVideo(this)"><img src="https://raw.githubusercontent.com/naushilrana6/thumbnail/d9106643d8737bc5ef13b865831e137044f82d0c/3D.jpg" alt="3D"><div class="play-btn">▶</div></div><iframe src="https://drive.google.com/file/d/1CC8zgTcDnzvBwB-904VCvwPLNBc1MnSH/preview"></iframe></div></div>
+            <div class="video-wrapper"><div class="video-inner"><div class="thumbnail-overlay" onclick="startVideo(this)"><img src="https://raw.githubusercontent.com/naushilrana6/thumbnail/6510b42cc3808fd60137cae720c8f8f6695d90f3/armyman.png" alt="Army"><div class="play-btn">▶</div></div><iframe src="https://drive.google.com/file/d/1C8C0VX3ZfkmC3FtZCtvbeC26_0CSqytR/preview"></iframe></div></div>
+        </div>
+
+        <h2 class="section-heading reveal">AI Cinematics Movies</h2>
+        <p class="section-subtext reveal">Pushing the boundaries of storytelling with AI-driven visuals.</p>
+        <div class="video-grid reveal">
+            <div class="video-wrapper"><div class="video-inner"><div class="thumbnail-overlay" onclick="startVideo(this)"><img src="https://images.unsplash.com/photo-1485846234645-a62644f84728?w=800" alt="Movie 1"><div class="play-btn">▶</div></div><iframe src="https://drive.google.com/file/d/15Cm6i5qyqH5XHTFtLaFyqQgDzZrT7oQj/preview"></iframe></div></div>
+            <div class="video-wrapper"><div class="video-inner"><div class="thumbnail-overlay" onclick="startVideo(this)"><img src="https://images.unsplash.com/photo-1533929736458-ca588d08c8be?w=800" alt="Movie 2"><div class="play-btn">▶</div></div><iframe src="https://drive.google.com/file/d/1wAEekR-x-wkl8umABVbCU_vcPEAXlN4N/preview"></iframe></div></div>
+        </div>
+    </div>
+
+    <footer>
+        <a href="index.html" class="footer-logo logo-animate">Naushil<span class="dot-blink">.</span></a>
+        <div style="color: var(--text-muted); font-size: 0.9rem; margin-top: 10px;">&copy; 2026 Crafted with Passion by <b>Naushil Rana</b>.<br>All Rights Reserved. Building the future of visual design.</div>
+    </footer>
+
+    <script>
+        function startVideo(element) {
+            element.style.display = 'none';
+            var wrapper = element.closest('.video-inner');
+            var iframe = wrapper.querySelector('iframe');
+            var currentSrc = iframe.src;
+            if (currentSrc.includes('?')) {
+                iframe.src = currentSrc + "&autoplay=1";
+            } else {
+                iframe.src = currentSrc + "?autoplay=1";
+            }
+        }
+
+        function reveal() {
+            var reveals = document.querySelectorAll('.reveal');
+            reveals.forEach(el => {
+                if (el.getBoundingClientRect().top < window.innerHeight - 50) el.classList.add('active');
+            });
+        }
+        window.addEventListener('scroll', reveal);
+        window.addEventListener('load', reveal);
+
+        document.getElementById('themeToggle').onclick = () => {
+            document.body.classList.toggle('light-mode');
+            document.getElementById('themeToggle').innerText = document.body.classList.contains('light-mode') ? '🌙' : '☀️';
+        };
+    </script>
+</body>
+</html>
