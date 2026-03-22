@@ -28,7 +28,6 @@
         .video-slider { width: 100%; overflow: hidden; position: relative; cursor: grab; background: var(--bg-tertiary); border-radius: 24px; padding: 40px 0; margin-bottom: 60px; touch-action: pan-y; }
         .video-track { display: flex; width: max-content; will-change: transform; }
 
-        /* 🌟 VIDEO CARD SETUP 🌟 */
         .video-card { 
             position: relative; 
             width: 380px; 
@@ -45,7 +44,6 @@
 
         .vertical-card { width: 280px; } 
 
-        /* 🌟 NEW: RIPPLE EFFECT GENERATOR ON TOUCH/CLICK 🌟 */
         .touch-ripple {
             position: absolute;
             width: 20px;
@@ -61,33 +59,27 @@
             100% { transform: translate(-50%, -50%) scale(40); opacity: 0; }
         }
 
-        /* 🌟 OVERRIDE OLD NEON FLOW - Disable old logic 🌟 */
         .video-card::before, .video-card::after { display: none; }
 
-        /* 🌟 NEW: STATIC HOVER GLOW & COLORED BORDER (Provided Image Style) 🌟 */
         .video-card:hover { 
             transform: translateY(-10px); 
-            /* Static Outer Glow, Inner Glow context, and sharp colored border like image */
-            box-shadow: 0 20px 45px rgba(0, 255, 204, 0.25), /* Outer Glow */
-                        0 0 10px rgba(0, 255, 204, 0.5), /* Near Inner Glow effect */
-                        inset 0 0 0 3px var(--accent); /* Sharp colored border effect context */
+            box-shadow: 0 20px 45px rgba(0, 255, 204, 0.25), 
+                        0 0 10px rgba(0, 255, 204, 0.5), 
+                        inset 0 0 0 3px var(--accent); 
             transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        /* 🌟 NEW: TACTILE PRESS EFFECT ON CLICK/TOUCH 🌟 */
         .video-card:active { 
             transform: scale(0.96) translateY(0); 
             box-shadow: 0 5px 15px rgba(0, 255, 204, 0.5),
-                        inset 0 0 0 3px var(--accent); /* Maintain border context when pressed */
+                        inset 0 0 0 3px var(--accent); 
             transition: transform 0.1s ease;
         }
 
-        /* 🌟 VIDEO BOX RATIOS 🌟 */
         .video-inner { position: relative; width: 100%; padding-bottom: 56.25%; background: #000; border-radius: 17px 17px 0 0; overflow: hidden; }
         .vertical-video-inner { position: relative; width: 100%; padding-bottom: 177.77%; background: #000; border-radius: 17px 17px 0 0; overflow: hidden; }
         .video-inner iframe, .vertical-video-inner iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; z-index: 1; }
 
-        /* Overlay & Play Button */
         .thumbnail-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; cursor: pointer; background: #000; display: flex; align-items: center; justify-content: center; }
         .thumbnail-overlay img { width: 100%; height: 100%; object-fit: cover; opacity: 0.7; transition: 0.4s ease; }
         .play-btn { position: absolute; width: 60px; height: 60px; background: rgba(0, 0, 0, 0.6); border: 2px solid var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--accent); font-size: 22px; transition: 0.3s ease; z-index: 6; box-shadow: 0 0 15px rgba(0, 255, 204, 0.3); }
@@ -95,7 +87,6 @@
         .thumbnail-overlay:hover .play-btn { transform: scale(1.1); background: var(--accent); color: #000; }
         .thumbnail-overlay:hover img { opacity: 0.4; }
 
-        /* Info Area */
         .video-info { padding: 15px 20px 20px; text-align: left; position: relative; z-index: 2; }
         .video-info h3 { font-size: 1.1rem; color: var(--accent); margin-bottom: 5px; font-weight: 600; }
         .video-info p { font-size: 0.85rem; color: var(--text-muted); line-height: 1.4; pointer-events: none; }
@@ -124,18 +115,17 @@
         <h2 class="section-heading">3D Pixar Animation</h2>
         <p class="section-subtext">High-quality 3D character animation and cinematic rendering.</p>
         <div class="video-slider" id="slider1"><div class="video-track" id="track1">
-            
             <div class="video-card">
                 <div class="video-inner">
                     <iframe 
-                        src="https://www.youtube.com/embed/sUzKtCQvmPM?autoplay=1&mute=1&loop=1&playlist=sUzKtCQvmPM&rel=0&modestbranding=1" 
+                        src="https://www.youtube.com/embed/sUzKtCQvmPM?rel=0&modestbranding=1" 
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                        allowfullscreen>
+                        allowfullscreen 
+                        referrerpolicy="strict-origin-when-cross-origin">
                     </iframe>
                 </div>
                 <div class="video-info"><h3>Cinematic Debut</h3><p>Stylized lighting & rendering.</p></div>
             </div>
-
         </div></div>
 
         <h2 class="section-heading">AI Cinematics Movies</h2>
@@ -222,30 +212,24 @@
             themeBtn.innerText = document.body.classList.contains('light-mode') ? '🌙' : '☀️'; 
         };
 
-        // Jerk-Free Smooth Slider Logic
         function setupSlider(sliderId, trackId) { 
             const track = document.getElementById(trackId); 
             const slider = document.getElementById(sliderId); 
-            // Duplicate content for infinite loop
             track.innerHTML += track.innerHTML; 
             
             let currentX = 0, isDragging = false, startX = 0, isHovered = false, isClickAllowed = true;
             let halfWidth = track.scrollWidth / 2;
 
-            // Recalculate on window resize to maintain smoothness
             window.addEventListener('resize', () => {
                 halfWidth = track.scrollWidth / 2;
             });
             
             function animate() { 
-                // Stop moving if dragged, hovered, OR if a video is playing inside this slider
                 if (!isDragging && !isHovered && slider.dataset.playing !== 'true') { 
-                    currentX -= 0.7; // Speed
-                    // Smooth reset with fractional pixel preservation context
+                    currentX -= 0.7; 
                     if (currentX <= -halfWidth) {
                         currentX += halfWidth; 
                     }
-                    // Hardware accelerated transform for buttery smoothness
                     track.style.transform = `translate3d(${currentX}px, 0, 0)`; 
                 } 
                 requestAnimationFrame(animate); 
@@ -268,7 +252,6 @@
                 if (Math.abs(x - currentX) > 5) isClickAllowed = false; 
                 currentX = x; 
                 
-                // Infinite loop logic during drag (Jerk-Free) context
                 if (currentX <= -halfWidth) {
                     currentX += halfWidth;
                     startX -= halfWidth;
@@ -287,19 +270,16 @@
             slider.addEventListener('click', (e) => { if (!isClickAllowed) e.preventDefault(); }, true);
         }
 
-        // Initialize all 4 sliders
         setupSlider('slider1', 'track1'); 
         setupSlider('slider2', 'track2');
         setupSlider('slider3', 'track3');
         setupSlider('slider4', 'track4');
 
-        // 🌟 NEW: RIPPLE EFFECT GENERATOR ON CLICK/TOUCH 🌟
         function createRipple(e) {
             const card = e.target.closest('.video-card');
             if (!card) return;
             
             const rect = card.getBoundingClientRect();
-            // Handle both touch and mouse coordinates context
             const clientX = e.touches ? e.touches[0].clientX : e.clientX;
             const clientY = e.touches ? e.touches[0].clientY : e.clientY;
             
@@ -312,16 +292,12 @@
             ripple.style.top = `${y}px`;
             
             card.appendChild(ripple);
-            
-            // Remove ripple after animation finishes
             setTimeout(() => { ripple.remove(); }, 600);
         }
 
-        // Attach ripple event globally to handle dynamically cloned cards context
         document.addEventListener('mousedown', createRipple);
         document.addEventListener('touchstart', createRipple, {passive: true});
 
-        // Play Video and Stop Slider permanently context
         function startVideo(element, sliderId) {
             element.style.display = 'none';
             var wrapper = element.parentElement;
