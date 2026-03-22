@@ -26,8 +26,7 @@
         .section-subtext { color: var(--text-muted); margin-bottom: 30px; font-size: 0.95rem; max-width: 600px; margin-inline: auto; }
         
         .video-slider { width: 100%; overflow: hidden; position: relative; cursor: grab; background: var(--bg-tertiary); border-radius: 24px; padding: 40px 0; margin-bottom: 60px; touch-action: pan-y; }
-        
-        .video-track { display: flex; justify-content: center; width: max-content; min-width: 100%; will-change: transform; transition: transform 0.1s ease-out; }
+        .video-track { display: flex; width: max-content; will-change: transform; }
 
         .video-card { 
             position: relative; 
@@ -77,10 +76,12 @@
             transition: transform 0.1s ease;
         }
 
-        /* Fully rounded corners for videos since there is no text below them now */
+        /* Full border radius for videos with no text */
         .video-inner { position: relative; width: 100%; padding-bottom: 56.25%; background: #000; border-radius: 17px; overflow: hidden; }
         .vertical-video-inner { position: relative; width: 100%; padding-bottom: 177.77%; background: #000; border-radius: 17px; overflow: hidden; }
-        .video-inner iframe, .vertical-video-inner iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; z-index: 1; }
+        
+        /* YouTube iframes set to ignore clicks (pointer-events: none) so dragging is perfectly smooth */
+        .video-inner iframe, .vertical-video-inner iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; z-index: 1; pointer-events: none; }
 
         .thumbnail-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; cursor: pointer; background: #000; display: flex; align-items: center; justify-content: center; border-radius: 17px; }
         .thumbnail-overlay img { width: 100%; height: 100%; object-fit: cover; opacity: 0.7; transition: 0.4s ease; border-radius: 17px; }
@@ -117,7 +118,7 @@
             <div class="video-card">
                 <div class="video-inner">
                     <iframe 
-                        src="https://www.youtube.com/embed/sUzKtCQvmPM?rel=0&modestbranding=1" 
+                        src="https://www.youtube.com/embed/sUzKtCQvmPM?autoplay=1&mute=1&loop=1&playlist=sUzKtCQvmPM&rel=0&modestbranding=1&controls=0" 
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
                         allowfullscreen 
                         referrerpolicy="strict-origin-when-cross-origin">
@@ -128,7 +129,7 @@
             <div class="video-card">
                 <div class="video-inner">
                     <iframe 
-                        src="https://www.youtube.com/embed/W_YumM7xZ3w?rel=0&modestbranding=1" 
+                        src="https://www.youtube.com/embed/W_YumM7xZ3w?autoplay=1&mute=1&loop=1&playlist=W_YumM7xZ3w&rel=0&modestbranding=1&controls=0" 
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
                         allowfullscreen 
                         referrerpolicy="strict-origin-when-cross-origin">
@@ -216,14 +217,37 @@
             themeBtn.innerText = document.body.classList.contains('light-mode') ? '🌙' : '☀️'; 
         };
 
+        // Infinite Loop JS is BACK
         function setupSlider(sliderId, trackId) { 
             const track = document.getElementById(trackId); 
             const slider = document.getElementById(sliderId); 
+            // Duplicate content for infinite loop
+            track.innerHTML += track.innerHTML; 
             
-            let currentX = 0, isDragging = false, startX = 0, isClickAllowed = true;
+            let currentX = 0, isDragging = false, startX = 0, isHovered = false, isClickAllowed = true;
+            let halfWidth = track.scrollWidth / 2;
+
+            window.addEventListener('resize', () => {
+                halfWidth = track.scrollWidth / 2;
+            });
+            
+            function animate() { 
+                if (!isDragging && !isHovered && slider.dataset.playing !== 'true') { 
+                    currentX -= 0.7; // Scrolling Speed
+                    if (currentX <= -halfWidth) {
+                        currentX += halfWidth; 
+                    }
+                    track.style.transform = `translate3d(${currentX}px, 0, 0)`; 
+                } 
+                requestAnimationFrame(animate); 
+            } 
+            animate();
+            
+            slider.onmouseenter = () => isHovered = true; 
+            slider.onmouseleave = () => isHovered = false;
             
             const startAction = (e) => { 
-                isDragging = true; isClickAllowed = true; 
+                isDragging = true; isHovered = true; isClickAllowed = true; 
                 const ev = e.touches ? e.touches[0] : e; 
                 startX = ev.pageX - currentX; 
             };
@@ -235,15 +259,18 @@
                 if (Math.abs(x - currentX) > 5) isClickAllowed = false; 
                 currentX = x; 
                 
-                const maxScroll = -(track.scrollWidth - slider.clientWidth);
-                if (currentX > 0) currentX = 0;
-                if (currentX < maxScroll && maxScroll < 0) currentX = maxScroll;
-                else if (maxScroll >= 0) currentX = 0; 
+                if (currentX <= -halfWidth) {
+                    currentX += halfWidth;
+                    startX -= halfWidth;
+                } else if (currentX > 0) {
+                    currentX -= halfWidth;
+                    startX += halfWidth;
+                }
                 
                 track.style.transform = `translate3d(${currentX}px, 0, 0)`; 
             };
             
-            const endAction = () => { isDragging = false; };
+            const endAction = () => { isDragging = false; setTimeout(() => { if (!isDragging) isHovered = false; }, 1500); };
             
             slider.addEventListener('mousedown', startAction); window.addEventListener('mousemove', moveAction); window.addEventListener('mouseup', endAction);
             slider.addEventListener('touchstart', startAction, {passive: true}); window.addEventListener('touchmove', moveAction); window.addEventListener('touchend', endAction);
@@ -286,6 +313,11 @@
             if(iframe) {
                 var currentSrc = iframe.src;
                 iframe.src = currentSrc.includes('?') ? currentSrc + "&autoplay=1" : currentSrc + "?autoplay=1";
+            }
+            
+            var parentSlider = document.getElementById(sliderId);
+            if(parentSlider) {
+                parentSlider.dataset.playing = 'true';
             }
         }
     </script>
