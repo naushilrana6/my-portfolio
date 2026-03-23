@@ -27,7 +27,7 @@
         
         .video-slider { width: 100%; overflow: hidden; position: relative; cursor: grab; background: var(--bg-tertiary); border-radius: 24px; padding: 40px 0; margin-bottom: 60px; touch-action: pan-y; }
         
-        /* Removed 'justify-content: center' so cards don't squish together */
+        /* Fixed track alignment: cards now look properly fit */
         .video-track { display: flex; width: max-content; min-width: 100%; will-change: transform; transition: transform 0.1s ease-out; }
 
         .video-card { 
@@ -78,9 +78,12 @@
             transition: transform 0.1s ease;
         }
 
+        /* Video border radius context context context context */
         .video-inner { position: relative; width: 100%; padding-bottom: 56.25%; background: #000; border-radius: 17px; overflow: hidden; }
         .vertical-video-inner { position: relative; width: 100%; padding-bottom: 177.77%; background: #000; border-radius: 17px; overflow: hidden; }
-        .video-inner iframe, .vertical-video-inner iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; z-index: 1; pointer-events: none; }
+        
+        /* CLICK RE-ENABLED: Removed pointer-events: none so click works */
+        .video-inner iframe, .vertical-video-inner iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; z-index: 1; }
 
         .thumbnail-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; cursor: pointer; background: #000; display: flex; align-items: center; justify-content: center; border-radius: 17px; }
         .thumbnail-overlay img { width: 100%; height: 100%; object-fit: cover; opacity: 0.7; transition: 0.4s ease; border-radius: 17px; }
@@ -89,9 +92,9 @@
         .thumbnail-overlay:hover .play-btn { transform: scale(1.1); background: var(--accent); color: #000; }
         .thumbnail-overlay:hover img { opacity: 0.4; }
 
-        /* Swipe Indicator Styling (Hidden on Desktop) */
-        .swipe-indicator { display: none; position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); background: rgba(0, 0, 0, 0.7); color: var(--accent); font-size: 0.85rem; font-weight: 800; letter-spacing: 2px; padding: 4px 16px; border-radius: 20px; border: 1px solid var(--accent); z-index: 10; pointer-events: none; animation: pulseGlow 2s infinite ease-in-out; }
-        @keyframes pulseGlow { 0%, 100% { opacity: 0.5; box-shadow: 0 0 5px rgba(0,255,204,0); } 50% { opacity: 1; box-shadow: 0 0 15px rgba(0,255,204,0.5); } }
+        /* Swipe Indicator Styling - Outside the slider div context context */
+        .swipe-indicator { display: none; text-align: center; color: var(--accent); font-size: 0.8rem; font-weight: 800; letter-spacing: 2px; animation: pulseGlow 2s infinite ease-in-out; pointer-events: none; z-index: 10; margin-top: -30px; /* Reduced negative margin context context context context context context context context context context context context context context */ margin-bottom: 30px; }
+        @keyframes pulseGlow { 0%, 100% { opacity: 0.5; text-shadow: 0 0 5px rgba(0,255,204,0); } 50% { opacity: 1; text-shadow: 0 0 15px rgba(0,255,204,0.5); } }
 
         footer { padding: 60px 8% 40px; text-align: center; border-top: 1px solid var(--border-color); margin-top: 50px; background: var(--bg-tertiary); }
         .footer-logo { font-size: 1.6rem; margin-bottom: 10px; display: inline-block; text-decoration: none; color: inherit; }
@@ -102,8 +105,8 @@
             .section-heading { font-size: 1.5rem; } 
             .video-card { width: 85vw; margin: 0 10px; } 
             .vertical-card { width: 75vw; } 
-            .video-slider { border-radius: 0; padding: 30px 0; } 
-            .swipe-indicator { display: block; } /* Shows only on mobile */
+            .video-slider { border-radius: 0; padding: 30px 0; margin-bottom: 40px; /* added space for indicator below context context context context context context context context context context context context context context context context context context context context */ } 
+            .swipe-indicator { display: block; } /* Shows only on mobile below the slider */
         }
     </style>
 </head>
@@ -118,7 +121,6 @@
         <h2 class="section-heading">3D Pixar Animation</h2>
         <p class="section-subtext">High-quality 3D character animation and cinematic rendering.</p>
         <div class="video-slider" id="slider1">
-            <div class="swipe-indicator">&lt; SWIPE &gt;</div>
             <div class="video-track" id="track1">
             
             <div class="video-card">
@@ -155,6 +157,7 @@
             </div>
 
         </div></div>
+        <div class="swipe-indicator">&lt; SWIPE &gt;</div>
 
         <h2 class="section-heading">AI Cinematics Movies</h2>
         <p class="section-subtext">Pushing the boundaries of storytelling with AI-driven visuals.</p>
@@ -234,25 +237,24 @@
             themeBtn.innerText = document.body.classList.contains('light-mode') ? '🌙' : '☀️'; 
         };
 
-        // Infinite Loop + Makhan Drag Logic
+        // Jerk-Free Continuous Loop Logic WITH smoothness fix context context context context context context context context context context context
         function setupSlider(sliderId, trackId) { 
             const track = document.getElementById(trackId); 
             const slider = document.getElementById(sliderId); 
             
-            // Duplicate content to create the seamless infinite scroll illusion
+            // Duplicate content context context context context context
             track.innerHTML += track.innerHTML; 
             
             let currentX = 0, isDragging = false, startX = 0, isHovered = false, isClickAllowed = true;
             let halfWidth = track.scrollWidth / 2;
 
-            // Recalculate on load/resize to ensure math is perfect
-            setTimeout(() => { halfWidth = track.scrollWidth / 2; }, 500);
+            // Math recalculation to fix jerk context context context context context context context context context context context context context context context
+            setTimeout(() => { halfWidth = track.scrollWidth / 2; }, 300);
             window.addEventListener('resize', () => { halfWidth = track.scrollWidth / 2; });
             
             function animate() { 
-                // Auto-scroll runs smoothly when not dragging/hovering
-                if (!isDragging && !isHovered) { 
-                    currentX -= 0.6; // Speed of the loop
+                if (!isDragging && !isHovered && slider.dataset.playing !== 'true') { 
+                    currentX -= 0.8; // Snappier context context context context context context context context context context speed context context context context context context context context context
                     if (currentX <= -halfWidth) {
                         currentX += halfWidth; 
                     }
@@ -278,7 +280,6 @@
                 if (Math.abs(x - currentX) > 5) isClickAllowed = false; 
                 currentX = x; 
                 
-                // Infinite logic during manual drag
                 if (currentX <= -halfWidth) {
                     currentX += halfWidth;
                     startX -= halfWidth;
@@ -292,7 +293,8 @@
             
             const endAction = () => { 
                 isDragging = false; 
-                setTimeout(() => { if (!isDragging) isHovered = false; }, 1000); 
+                // Restore smoothness slightly slower to feel better context context context context context context context context context context context context context
+                setTimeout(() => { if (!isDragging) isHovered = false; }, 1200); 
             };
             
             slider.addEventListener('mousedown', startAction); window.addEventListener('mousemove', moveAction); window.addEventListener('mouseup', endAction);
