@@ -27,7 +27,7 @@
         
         .video-slider { width: 100%; overflow: hidden; position: relative; cursor: grab; background: var(--bg-tertiary); border-radius: 24px; padding: 40px 0; margin-bottom: 60px; touch-action: pan-y; }
         
-        /* Removed transition entirely to kill the jerk effect */
+        /* Removed all CSS transitions here to ensure JS handles movement without jerk */
         .video-track { display: flex; width: max-content; min-width: 100%; will-change: transform; }
 
         .video-card { 
@@ -80,10 +80,9 @@
 
         .video-inner { position: relative; width: 100%; padding-bottom: 56.25%; background: #000; border-radius: 17px; overflow: hidden; }
         .vertical-video-inner { position: relative; width: 100%; padding-bottom: 177.77%; background: #000; border-radius: 17px; overflow: hidden; }
+        
+        /* Direct iFrame access without overlays for true Play/Pause/Volume support */
         .video-inner iframe, .vertical-video-inner iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; z-index: 1; }
-
-        /* The Magic Layer to fix Mobile Swipe, Pause, and Play issues */
-        .touch-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 75%; z-index: 5; }
 
         .thumbnail-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; cursor: pointer; background: #000; display: flex; align-items: center; justify-content: center; border-radius: 17px; }
         .thumbnail-overlay img { width: 100%; height: 100%; object-fit: cover; opacity: 0.7; transition: 0.4s ease; border-radius: 17px; }
@@ -92,7 +91,8 @@
         .thumbnail-overlay:hover .play-btn { transform: scale(1.1); background: var(--accent); color: #000; }
         .thumbnail-overlay:hover img { opacity: 0.4; }
 
-        .swipe-indicator { display: none; text-align: center; color: var(--accent); font-size: 0.8rem; font-weight: 800; letter-spacing: 2px; animation: pulseGlow 2s infinite ease-in-out; pointer-events: none; z-index: 10; margin-top: -30px; margin-bottom: 30px; }
+        /* Moved indicator down below the cards so it does not disturb video */
+        .swipe-indicator { display: none; text-align: center; color: var(--accent); font-size: 0.8rem; font-weight: 800; letter-spacing: 2px; animation: pulseGlow 2s infinite ease-in-out; pointer-events: none; z-index: 10; margin-top: 15px; margin-bottom: 25px; }
         @keyframes pulseGlow { 0%, 100% { opacity: 0.5; text-shadow: 0 0 5px rgba(0,255,204,0); } 50% { opacity: 1; text-shadow: 0 0 15px rgba(0,255,204,0.5); } }
 
         footer { padding: 60px 8% 40px; text-align: center; border-top: 1px solid var(--border-color); margin-top: 50px; background: var(--bg-tertiary); }
@@ -104,7 +104,7 @@
             .section-heading { font-size: 1.5rem; } 
             .video-card { width: 85vw; margin: 0 10px; } 
             .vertical-card { width: 75vw; } 
-            .video-slider { border-radius: 0; padding: 30px 0; margin-bottom: 40px; } 
+            .video-slider { border-radius: 0; padding: 30px 0; margin-bottom: 20px; } 
             .swipe-indicator { display: block; } 
         }
     </style>
@@ -124,36 +124,30 @@
             
             <div class="video-card">
                 <div class="video-inner">
-                    <div class="touch-overlay" onclick="toggleYouTube(this)"></div>
                     <iframe 
-                        src="https://www.youtube.com/embed/sUzKtCQvmPM?autoplay=1&mute=1&loop=1&playlist=sUzKtCQvmPM&rel=0&modestbranding=1&controls=1&enablejsapi=1" 
+                        src="https://www.youtube.com/embed/sUzKtCQvmPM?autoplay=1&mute=1&loop=1&playlist=sUzKtCQvmPM&rel=0&modestbranding=1" 
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                        allowfullscreen 
-                        referrerpolicy="strict-origin-when-cross-origin">
+                        allowfullscreen>
                     </iframe>
                 </div>
             </div>
 
             <div class="video-card">
                 <div class="video-inner">
-                    <div class="touch-overlay" onclick="toggleYouTube(this)"></div>
                     <iframe 
-                        src="https://www.youtube.com/embed/W_YumM7xZ3w?autoplay=1&mute=1&loop=1&playlist=W_YumM7xZ3w&rel=0&modestbranding=1&controls=1&enablejsapi=1" 
+                        src="https://www.youtube.com/embed/W_YumM7xZ3w?autoplay=1&mute=1&loop=1&playlist=W_YumM7xZ3w&rel=0&modestbranding=1" 
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                        allowfullscreen 
-                        referrerpolicy="strict-origin-when-cross-origin">
+                        allowfullscreen>
                     </iframe>
                 </div>
             </div>
 
             <div class="video-card">
                 <div class="video-inner">
-                    <div class="touch-overlay" onclick="toggleYouTube(this)"></div>
                     <iframe 
-                        src="https://www.youtube.com/embed/gATZMg0J-Y8?autoplay=1&mute=1&loop=1&playlist=gATZMg0J-Y8&rel=0&modestbranding=1&controls=1&enablejsapi=1" 
+                        src="https://www.youtube.com/embed/gATZMg0J-Y8?autoplay=1&mute=1&loop=1&playlist=gATZMg0J-Y8&rel=0&modestbranding=1" 
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                        allowfullscreen 
-                        referrerpolicy="strict-origin-when-cross-origin">
+                        allowfullscreen>
                     </iframe>
                 </div>
             </div>
@@ -239,46 +233,22 @@
             themeBtn.innerText = document.body.classList.contains('light-mode') ? '🌙' : '☀️'; 
         };
 
-        // NEW: Function to play/pause YouTube on tap via API
-        function toggleYouTube(overlay) {
-            const iframe = overlay.nextElementSibling;
-            if (!iframe || iframe.tagName !== 'IFRAME') return;
-            
-            // Assume it's playing initially since autoplay=1
-            const isPlaying = overlay.dataset.playing !== 'false'; 
-            
-            iframe.contentWindow.postMessage(JSON.stringify({
-                event: 'command',
-                func: isPlaying ? 'pauseVideo' : 'playVideo',
-                args: []
-            }), '*');
-            
-            overlay.dataset.playing = isPlaying ? 'false' : 'true';
-        }
-
-        // Logic for pausing slider when native bottom volume controls are touched
-        window.addEventListener('blur', () => {
-            document.querySelectorAll('.video-slider').forEach(s => { if(s.onmouseenter) s.onmouseenter(); });
-        });
-        window.addEventListener('focus', () => {
-            document.querySelectorAll('.video-slider').forEach(s => { if(s.onmouseleave) s.onmouseleave(); });
-        });
-
+        // NEW Jerk-Free Drag & Smooth Infinite Loop Math
         function setupSlider(sliderId, trackId) { 
             const track = document.getElementById(trackId); 
             const slider = document.getElementById(sliderId); 
             
             track.innerHTML += track.innerHTML; 
             
-            let currentX = 0, isDragging = false, startX = 0, isHovered = false, isClickAllowed = true;
+            let currentX = 0, isDragging = false, startX = 0, startScrollX = 0, isHovered = false;
             let halfWidth = track.scrollWidth / 2;
 
-            setTimeout(() => { halfWidth = track.scrollWidth / 2; }, 300);
+            setTimeout(() => { halfWidth = track.scrollWidth / 2; }, 500);
             window.addEventListener('resize', () => { halfWidth = track.scrollWidth / 2; });
             
             function animate() { 
-                if (!isDragging && !isHovered && slider.dataset.playing !== 'true') { 
-                    currentX -= 0.8; 
+                if (!isDragging && !isHovered) { 
+                    currentX -= 0.6; // Consistent smooth speed
                     if (currentX <= -halfWidth) {
                         currentX += halfWidth; 
                     }
@@ -288,28 +258,39 @@
             } 
             animate();
             
-            slider.onmouseenter = () => isHovered = true; 
-            slider.onmouseleave = () => isHovered = false;
+            // Pauses the animation loop entirely when touched so video can be clicked properly
+            slider.addEventListener('mouseenter', () => isHovered = true);
+            slider.addEventListener('mouseleave', () => isHovered = false);
             
             const startAction = (e) => { 
-                isDragging = true; isHovered = true; isClickAllowed = true; 
+                isDragging = true; 
+                isHovered = true; 
                 const ev = e.touches ? e.touches[0] : e; 
-                startX = ev.pageX - currentX; 
+                startX = ev.pageX; 
+                startScrollX = currentX; 
             };
             
             const moveAction = (e) => { 
                 if (!isDragging) return; 
                 const ev = e.touches ? e.touches[0] : e; 
-                const x = ev.pageX - startX; 
-                if (Math.abs(x - currentX) > 5) isClickAllowed = false; 
-                currentX = x; 
+                const walk = ev.pageX - startX; 
                 
+                // Allow native vertical scrolling if user swipes up/down
+                if (e.cancelable && Math.abs(walk) > 5 && e.type === 'touchmove') {
+                    e.preventDefault();
+                }
+
+                currentX = startScrollX + walk; 
+                
+                // Bulletproof math to prevent jerk during infinite drag bounds
                 if (currentX <= -halfWidth) {
                     currentX += halfWidth;
-                    startX -= halfWidth;
+                    startX += halfWidth;
+                    startScrollX += halfWidth;
                 } else if (currentX > 0) {
                     currentX -= halfWidth;
-                    startX += halfWidth;
+                    startX -= halfWidth;
+                    startScrollX -= halfWidth;
                 }
                 
                 track.style.transform = `translate3d(${currentX}px, 0, 0)`; 
@@ -317,19 +298,17 @@
             
             const endAction = () => { 
                 isDragging = false; 
-                setTimeout(() => { if (!isDragging) isHovered = false; }, 1200); 
+                setTimeout(() => { if (!isDragging) isHovered = false; }, 1000); 
             };
             
-            slider.addEventListener('mousedown', startAction); window.addEventListener('mousemove', moveAction); window.addEventListener('mouseup', endAction);
-            slider.addEventListener('touchstart', startAction, {passive: true}); window.addEventListener('touchmove', moveAction); window.addEventListener('touchend', endAction);
-            
-            // Advanced click blocker ensures swipe doesn't trigger tap
-            slider.addEventListener('click', (e) => { 
-                if (!isClickAllowed) {
-                    e.preventDefault(); 
-                    e.stopPropagation();
-                } 
-            }, true);
+            slider.addEventListener('mousedown', startAction); 
+            window.addEventListener('mousemove', moveAction, {passive: false}); 
+            window.addEventListener('mouseup', endAction);
+
+            slider.addEventListener('touchstart', startAction, {passive: true}); 
+            slider.addEventListener('touchmove', moveAction, {passive: false}); 
+            slider.addEventListener('touchend', endAction);
+            slider.addEventListener('touchcancel', endAction);
         }
 
         setupSlider('slider1', 'track1'); 
