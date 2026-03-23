@@ -27,7 +27,7 @@
         
         .video-slider { width: 100%; overflow: hidden; position: relative; cursor: grab; background: var(--bg-tertiary); border-radius: 24px; padding: 40px 0; margin-bottom: 60px; touch-action: pan-y; }
         
-        /* CSS transition hata diya gaya hai jerk rokne ke liye */
+        /* Removed transition entirely to kill the jerk effect */
         .video-track { display: flex; width: max-content; min-width: 100%; will-change: transform; }
 
         .video-card { 
@@ -80,8 +80,10 @@
 
         .video-inner { position: relative; width: 100%; padding-bottom: 56.25%; background: #000; border-radius: 17px; overflow: hidden; }
         .vertical-video-inner { position: relative; width: 100%; padding-bottom: 177.77%; background: #000; border-radius: 17px; overflow: hidden; }
-        
         .video-inner iframe, .vertical-video-inner iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; z-index: 1; }
+
+        /* The Magic Layer to fix Mobile Swipe, Pause, and Play issues */
+        .touch-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 75%; z-index: 5; }
 
         .thumbnail-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; cursor: pointer; background: #000; display: flex; align-items: center; justify-content: center; border-radius: 17px; }
         .thumbnail-overlay img { width: 100%; height: 100%; object-fit: cover; opacity: 0.7; transition: 0.4s ease; border-radius: 17px; }
@@ -122,8 +124,9 @@
             
             <div class="video-card">
                 <div class="video-inner">
+                    <div class="touch-overlay" onclick="toggleYouTube(this)"></div>
                     <iframe 
-                        src="https://www.youtube.com/embed/sUzKtCQvmPM?autoplay=1&mute=1&loop=1&playlist=sUzKtCQvmPM&rel=0&modestbranding=1&controls=1" 
+                        src="https://www.youtube.com/embed/sUzKtCQvmPM?autoplay=1&mute=1&loop=1&playlist=sUzKtCQvmPM&rel=0&modestbranding=1&controls=1&enablejsapi=1" 
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
                         allowfullscreen 
                         referrerpolicy="strict-origin-when-cross-origin">
@@ -133,8 +136,9 @@
 
             <div class="video-card">
                 <div class="video-inner">
+                    <div class="touch-overlay" onclick="toggleYouTube(this)"></div>
                     <iframe 
-                        src="https://www.youtube.com/embed/W_YumM7xZ3w?autoplay=1&mute=1&loop=1&playlist=W_YumM7xZ3w&rel=0&modestbranding=1&controls=1" 
+                        src="https://www.youtube.com/embed/W_YumM7xZ3w?autoplay=1&mute=1&loop=1&playlist=W_YumM7xZ3w&rel=0&modestbranding=1&controls=1&enablejsapi=1" 
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
                         allowfullscreen 
                         referrerpolicy="strict-origin-when-cross-origin">
@@ -144,8 +148,9 @@
 
             <div class="video-card">
                 <div class="video-inner">
+                    <div class="touch-overlay" onclick="toggleYouTube(this)"></div>
                     <iframe 
-                        src="https://www.youtube.com/embed/gATZMg0J-Y8?autoplay=1&mute=1&loop=1&playlist=gATZMg0J-Y8&rel=0&modestbranding=1&controls=1" 
+                        src="https://www.youtube.com/embed/gATZMg0J-Y8?autoplay=1&mute=1&loop=1&playlist=gATZMg0J-Y8&rel=0&modestbranding=1&controls=1&enablejsapi=1" 
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
                         allowfullscreen 
                         referrerpolicy="strict-origin-when-cross-origin">
@@ -234,6 +239,31 @@
             themeBtn.innerText = document.body.classList.contains('light-mode') ? '🌙' : '☀️'; 
         };
 
+        // NEW: Function to play/pause YouTube on tap via API
+        function toggleYouTube(overlay) {
+            const iframe = overlay.nextElementSibling;
+            if (!iframe || iframe.tagName !== 'IFRAME') return;
+            
+            // Assume it's playing initially since autoplay=1
+            const isPlaying = overlay.dataset.playing !== 'false'; 
+            
+            iframe.contentWindow.postMessage(JSON.stringify({
+                event: 'command',
+                func: isPlaying ? 'pauseVideo' : 'playVideo',
+                args: []
+            }), '*');
+            
+            overlay.dataset.playing = isPlaying ? 'false' : 'true';
+        }
+
+        // Logic for pausing slider when native bottom volume controls are touched
+        window.addEventListener('blur', () => {
+            document.querySelectorAll('.video-slider').forEach(s => { if(s.onmouseenter) s.onmouseenter(); });
+        });
+        window.addEventListener('focus', () => {
+            document.querySelectorAll('.video-slider').forEach(s => { if(s.onmouseleave) s.onmouseleave(); });
+        });
+
         function setupSlider(sliderId, trackId) { 
             const track = document.getElementById(trackId); 
             const slider = document.getElementById(sliderId); 
@@ -270,13 +300,6 @@
             const moveAction = (e) => { 
                 if (!isDragging) return; 
                 const ev = e.touches ? e.touches[0] : e; 
-                
-                // Prevent vertical scroll interference while sliding horizontally on mobile
-                const deltaX = ev.pageX - startX - currentX;
-                if (Math.abs(deltaX) > 2 && e.cancelable) {
-                    e.preventDefault();
-                }
-
                 const x = ev.pageX - startX; 
                 if (Math.abs(x - currentX) > 5) isClickAllowed = false; 
                 currentX = x; 
@@ -297,9 +320,16 @@
                 setTimeout(() => { if (!isDragging) isHovered = false; }, 1200); 
             };
             
-            slider.addEventListener('mousedown', startAction); window.addEventListener('mousemove', moveAction, {passive: false}); window.addEventListener('mouseup', endAction);
-            slider.addEventListener('touchstart', startAction, {passive: true}); window.addEventListener('touchmove', moveAction, {passive: false}); window.addEventListener('touchend', endAction);
-            slider.addEventListener('click', (e) => { if (!isClickAllowed) e.preventDefault(); }, true);
+            slider.addEventListener('mousedown', startAction); window.addEventListener('mousemove', moveAction); window.addEventListener('mouseup', endAction);
+            slider.addEventListener('touchstart', startAction, {passive: true}); window.addEventListener('touchmove', moveAction); window.addEventListener('touchend', endAction);
+            
+            // Advanced click blocker ensures swipe doesn't trigger tap
+            slider.addEventListener('click', (e) => { 
+                if (!isClickAllowed) {
+                    e.preventDefault(); 
+                    e.stopPropagation();
+                } 
+            }, true);
         }
 
         setupSlider('slider1', 'track1'); 
